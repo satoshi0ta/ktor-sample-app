@@ -33,4 +33,42 @@ class ApplicationTest {
         assertEquals("html", response.contentType()?.contentSubtype)
         assertContains(response.bodyAsText(), "Hello From Ktor")
     }
+
+    @Test
+    fun tasksCanBeFoundByPriority() = testApplication {
+        application {
+            module()
+        }
+
+        val response = client.get("/tasks/byPriority/Medium")
+        val body = response.bodyAsText()
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertContains(body, "Mow the lawn")
+        assertContains(body, "Paint the fence")
+    }
+
+    @Test
+    fun invalidPriorityProduces400() = testApplication {
+        application {
+            module()
+        }
+
+        val response = client.get("/tasks/byPriority/Invalid")
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @Test
+    fun tasksCanBeFoundByPriorityVital() = testApplication {
+        application {
+            module()
+        }
+
+        val response = client.get("/tasks/byPriority/Vital")
+        val body = response.bodyAsText()
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertContains(body, "coding")
+        assertContains(body, "Learn Ktor")
+    }
 }
